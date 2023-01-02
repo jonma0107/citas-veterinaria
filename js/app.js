@@ -10,6 +10,8 @@ const sintomasInput = document.querySelector('#sintomas');
 const formulario = document.querySelector('#nueva-cita');
 const contenedorCitas = document.querySelector('#citas');
 
+let editando;
+
 // Registrar eventos
 eventListeners();
 function eventListeners() {
@@ -31,14 +33,17 @@ class Citas {
   }
 
   agregarCita(cita) {
-    this.citas = [...this.citas, cita];
-
-    console.log(this.citas);
+    this.citas = [...this.citas, cita]; // Spreed operator, hace una copia del Obj
   }
 
   eliminarCita(id) {
-    this.citas = this.citas.filter(cita => cita.id !== id) // este código se elimina
+    this.citas = this.citas.filter(cita => cita.id !== id) // este código elimina CITA
   }
+
+  editarCita(citaActualizada) {
+    this.citas = this.citas.map(cita => cita.id === citaActualizada.id ? citaActualizada : cita)
+  }
+
 }; // Fin clase Citas
 
 /********************************************************************************/
@@ -114,7 +119,14 @@ class UI {
 
       btnEliminar.onclick = () => {
         eliminarCita(id)
-      }
+      };
+
+      // Botón para editar Cita
+      const btnEditar = document.createElement('button');
+      btnEditar.classList.add('btn', 'btn-info');
+      btnEditar.innerHTML = 'Editar <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path></svg>';
+
+      btnEditar.onclick = () => editandoCita(cita);
 
       // Agregar los párrafos al divCita
       divCita.appendChild(mascotaParrafo);
@@ -124,6 +136,7 @@ class UI {
       divCita.appendChild(horaParrafo);
       divCita.appendChild(sintomasParrafo);
       divCita.appendChild(btnEliminar);
+      divCita.appendChild(btnEditar);
 
       // Agregar las citas al HTML
       contenedorCitas.appendChild(divCita);
@@ -174,15 +187,29 @@ function nuevaCita(e) {
   if (mascota === '' || propietario === '' || telefono === '' || fecha === '' || hora === '' || sintomas === '') {
     ui.imprimirAlerta('Todos los campos son obligatorios', 'error')
     return;
-  }
+  };
 
   // Despues de pasar la anterior validación, se crea una nueva cita
 
-  // Generar un id único
-  citaObj.id = Date.now();
+  if (editando) {
+    ui.imprimirAlerta('EDITADO correctamente')
+    // PASAR EL OBJETO DE LA CITA A EDICIÓN
+    citas.editarCita({ ...citaObj })
 
-  // Agregar cita
-  citas.agregarCita({ ...citaObj });
+    // Regresar el estado del botón a su estado original
+    formulario.querySelector('button[type="submit"]').textContent = 'Crear Cita';
+
+    editando = false;
+  } else {
+    // Generar un id único
+    citaObj.id = Date.now();
+
+    // Agregar cita
+    citas.agregarCita({ ...citaObj });
+
+    // Mensajes de agregado correctamente
+    ui.imprimirAlerta('Se agregó correctamente');
+  };
 
   // reiniciar el Objeto para la validación
   reiniciarObj()
@@ -211,6 +238,31 @@ function eliminarCita(id) {
   ui.imprimirAlerta('La cita se eliminó correctamente');
   // Refrescar
   ui.imprimirCitas(citas);
+}
+
+function editandoCita(cita) {
+  const { mascota, propietario, telefono, fecha, hora, sintomas, id } = cita;
+  // Llenar los inputs
+  mascotaInput.value = mascota;
+  propietarioInput.value = propietario;
+  telefonoInput.value = telefono;
+  fechaInput.value = fecha;
+  horaInput.value = hora;
+  sintomasInput.value = sintomas;
+
+  // LLenar el objeto!
+  citaObj.mascota = mascota;
+  citaObj.propietario = propietario;
+  citaObj.telefono = telefono;
+  citaObj.fecha = fecha;
+  citaObj.hora = hora;
+  citaObj.sintomas = sintomas;
+  citaObj.id = id;
+
+  // Cambiar el botón verde de crear cita
+  formulario.querySelector('button[type="submit"]').textContent = 'Guardar cambios';
+
+  editando = true;
 
 }
 
