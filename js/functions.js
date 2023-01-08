@@ -48,7 +48,7 @@ export function nuevaCita(e) {
     // PASAR EL OBJETO DE LA CITA A EDICIÓN
     citas.editarCita({ ...citaObj })
 
-    //  ************************** EDITAR REGISTRO EN IndexedDB *********************
+    //  ************************* EDITAR REGISTRO EN IndexedDB *************************
     const transaction = DB.transaction(['bd'], 'readwrite');
     const objectStore = transaction.objectStore('bd');
     objectStore.put(citaObj);
@@ -70,7 +70,7 @@ export function nuevaCita(e) {
     // Agregar cita
     citas.agregarCita({ ...citaObj });
 
-    //  ******************* INSERTAR REGISTRO EN IndexedDB *********************
+    //  ************************ INSERTAR REGISTRO EN IndexedDB ***********************
     let transaction = DB.transaction(['bd'], 'readwrite');
     // crear el objectStore
     const objectStore = transaction.objectStore('bd');// le decimos que estamos utilizando bd como base de datos
@@ -81,6 +81,7 @@ export function nuevaCita(e) {
       // Mensajes de agregado correctamente
       ui.imprimirAlerta('Se agregó correctamente');
     }
+    //*********************************************************************************/
 
   };
 
@@ -108,7 +109,7 @@ export function eliminarCita(id) {
   // Eliminar Citas
   citas.eliminarCita(id);
 
-  //  ******************* ELIMINAR REGISTRO EN IndexedDB *********************
+  //  ************************ ELIMINAR REGISTRO EN IndexedDB ***********************
   const transaction = DB.transaction(['bd'], 'readwrite');
   const objectStore = transaction.objectStore('bd');
   objectStore.delete(id);
@@ -118,8 +119,8 @@ export function eliminarCita(id) {
     ui.imprimirAlerta('La cita se eliminó correctamente');
     // Refrescar
     ui.imprimirCitas();
-
   }
+  //*********************************************************************************/
 
 };
 
